@@ -1,0 +1,28 @@
+language: cpp
+compiler: gcc
+sudo: require
+dist: trusty
+
+install:
+  - sudo apt-get -y install gcc make gettext libxml-parser-perl intltool libgnome2-dev libgtk2.0-dev libglade2-dev libgconf2-dev libgtop2-dev libappindicator-dev
+
+script:
+  - cd netactview
+  - ./configure --prefix=/usr
+  - make -j$(nproc)
+  - make install DESTDIR=$(readlink -f appdir) ; find appdir/
+  - cp appdir/usr/share/pixmaps/netactview.png appdir/
+  - cp ../distribution/AppImage/AppRun appdir/ ; chmod +x appdir/AppRun
+  - sed -i -e 's|/usr|././|g' appdir/usr/bin/netactview
+  - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+  - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+  - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
+
+after_success:
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash upload.sh Net*.AppImage*
+  
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)/
