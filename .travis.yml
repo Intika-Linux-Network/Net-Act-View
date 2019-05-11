@@ -12,6 +12,8 @@ script:
   - make -j$(nproc)
   - make install DESTDIR=$(readlink -f appdir) ; find appdir/
   - cp appdir/usr/share/pixmaps/netactview.png appdir/
+  - cp ../distribution/AppImage/AppRun appdir/ ; chmod +x appdir/AppRun
+  - sed -i -e 's|/usr|././|g' appdir/usr/bin/netactview
   - wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
   - chmod a+x linuxdeployqt-continuous-x86_64.AppImage
   - ./linuxdeployqt-continuous-x86_64.AppImage appdir/usr/share/applications/*.desktop -appimage
